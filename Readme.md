@@ -179,9 +179,9 @@ Once consumed by the Spark Streaming application, the data is processed and stru
 
 After processing the data, the results are stored in HBase with the following structure:
 
-| RowKey               | Timestamp           | Bitcoin Price | Ethereum Price |
-|----------------------|---------------------|---------------|----------------|
-| 2024-10-07T11:49:22  | 2024-10-07 11:49:22 | $63,449       | $2,458.8       |
+| RowKey               | Timestamp           | Price Data |
+|----------------------|---------------------|-----------|
+| 2024-10-07T11:49:22  | 2024-10-07 11:49:22 | $63,449   |
 
 #### **Querying HBase:**
 
