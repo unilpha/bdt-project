@@ -34,7 +34,7 @@ public class CryptoStreamingService {
         try (Response response = client.newCall(request).execute()) {
             if (response.isSuccessful()) {
                 String coinData = response.body().string();
-                kafkaProducerService.send("aws_crypto2", coinData);
+                kafkaProducerService.send("crypto_prices", coinData);
                 log.info("Sending Coin data to Kafka: {}", coinData);
             }
         } catch (Exception e) {

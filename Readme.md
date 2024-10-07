@@ -126,9 +126,74 @@ cd spark
 mvn exec:java -Dexec.mainClass="com.bdt.assignment.App"
 ```
 
-### Step 2: HBase Integration
+### Step 2: Setup HBase Table
+
+In the Hbase Shell, create a table called `crypto_prices` with the following schema:
+
+```bash
+hbase> create 'crypto_prices', 'price_data'
+```
+
+### Step 3: HBase Integration
 
 The Spark consumer processes the data and stores it into HBase using the `HBaseService.java`. Ensure HBase is running and properly configured.
+
+---
+
+## **Sample Data and Output**
+
+### **CoinGecko API Response:**
+
+```json
+{
+    "bitcoin": {
+        "usd": 63449
+    },
+    "ethereum": {
+        "usd": 2458.8
+    }
+}
+```
+
+### **Kafka Producer Sample Output:**
+
+The following is an example of a JSON message sent to the Kafka `crypto_prices` topic:
+
+```json
+{
+    "timestamp": "2024-10-07T11:49:22",
+    "bitcoin": {
+        "usd": 63449
+    },
+    "ethereum": {
+        "usd": 2458.8
+    }
+}
+```
+
+### **Kafka Consumer and Spark Streaming Processing:**
+
+Once consumed by the Spark Streaming application, the data is processed and structured for storage in HBase.
+
+### **HBase Storage Format:**
+
+After processing the data, the results are stored in HBase with the following structure:
+
+| RowKey               | Timestamp           | Bitcoin Price | Ethereum Price |
+|----------------------|---------------------|---------------|----------------|
+| 2024-10-07T11:49:22  | 2024-10-07 11:49:22 | $63,449       | $2,458.8       |
+
+#### **Querying HBase:**
+
+You can query the HBase table to retrieve cryptocurrency prices:
+
+```bash
+hbase> scan 'crypto_prices'
+```
+
+Example Output:
+
+![hbase-sample-result.png](hbase-sample-result.png)
 
 ---
 

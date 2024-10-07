@@ -29,7 +29,7 @@ public class SparkKafkaConsumerService {
         JavaSparkContext sc = new JavaSparkContext(conf);
         JavaStreamingContext ssc = new JavaStreamingContext(sc, new Duration(20000));
 
-        Set<String> topics = Collections.singleton("aws_crypto2");
+        Set<String> topics = Collections.singleton("crypto_prices");
 
 
         Map<String, String> kafkaParams = new HashMap<>();
