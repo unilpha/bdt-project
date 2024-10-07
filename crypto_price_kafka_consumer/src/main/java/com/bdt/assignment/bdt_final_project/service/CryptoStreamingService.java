@@ -1,51 +1,51 @@
 package com.bdt.assignment.bdt_final_project.service;
 
-import com.bdt.assignment.bdt_final_project.config.KafkaProducer;
-import com.bdt.assignment.bdt_final_project.data.CryptoData;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.bdt.assignment.bdt_final_project.config.CoinGeckoProperties;
+import com.bdt.assignment.bdt_final_project.producer.KafkaProducer;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class CryptoStreamingService {
 
+    private final OkHttpClient client = new OkHttpClient();
+    private final CoinGeckoProperties coinGeckoProperties;
     private final KafkaProducer kafkaProducerService;
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    public CryptoData fetchCryptoData() {
-        try {
-            OkHttpClient client = new OkHttpClient();
 
-            Request request = new Request.Builder()
-                    .url("https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd")
-                    .get()
-                    .addHeader("accept", "application/json")
-                    .addHeader("x-cg-pro-api-key", "CG-7MHiQdcM1WgJBnBtBbND8oJR")
-                    .build();
+    public void fetchCryptoData() {
+        Request request = new Request.Builder()
+                .url(coinGeckoProperties.getUrl())
+                .get()
+                .addHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
+                .addHeader(coinGeckoProperties.getAuthHeader(), coinGeckoProperties.getAuthKey())
+                .build();
 
-            Response response = client.newCall(request).execute();
-            if (response.isSuccessful() && response.body() != null) {
-                String jsonResponse = response.body().string();
-                kafkaProducerService.send("aws_crypto2", jsonResponse);
-                return objectMapper.readValue(jsonResponse, CryptoData.class);
-            } else {
-                System.out.println("response = " + response);
-                throw new RuntimeException("Failed to fetch crypto data");
+        try (Response response = client.newCall(request).execute()) {
+            if (response.isSuccessful()) {
+                String coinData = response.body().string();
+                kafkaProducerService.send("aws_crypto2", coinData);
+                log.info("Sending Coin data to Kafka: {}", coinData);
             }
-
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException("Failed to fetch crypto data");
+            log.error("Error fetching crypto data");
         }
     }
 
+
     @Scheduled(fixedRate = 10000)
     public void scheduleFetchCryptoData() {
-        System.out.println("Fetching crypto data");
+        log.info("Fetching crypto data from CoinGecko API... @ {}", LocalDateTime.now());
         fetchCryptoData();
     }
 

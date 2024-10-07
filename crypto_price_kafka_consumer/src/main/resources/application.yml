@@ -6,3 +6,9 @@ spring:
 
 server:
   port: 8086
+
+
+coin-gecko:
+  url: https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum&vs_currencies=usd
+  auth-key: CG-7MHiQdcM1WgJBnBtBbND8oJR
+  auth-header: x-cg-pro-api-key
