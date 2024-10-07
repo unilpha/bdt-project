@@ -1,0 +1,12 @@
+
+.idea/encodings.xml
+.idea/**
+.DS_Store
+*.properties
+**/target/**
+spark/target/surefire-reports/com.bdt.assignment.AppTest.txt
+spark/target/**
+**.class
+*.class
+spark/target/test-classes/com/bdt/assignment/AppTest.class
+spark/.settings/org.eclipse.m2e.core.prefs
